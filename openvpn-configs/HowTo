@@ -103,4 +103,7 @@ cert /etc/openvpn/client.crt
 key /etc/openvpn/client.key
 
 Reference:
+www.discusscomputerx.blogspot.com
 https://www.packtpub.com/networking-and-servers/mastering-openvpn
+https://philpep.org/blog/fail2ban-sshd-et-pf
+https://www.freebsd.org/doc/handbook/
