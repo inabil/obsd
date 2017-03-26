@@ -1,0 +1,5 @@
+description "OpenVPN to local neti 192.168.0.x "
+! /usr/local/sbin/openvpn --daemon  --config  /etc/openvpn/server.conf  --dev $if --server 10.30.0.0 255.255.255.0 --push "route 192.168.220.0 255.255.255.0" & false
+
+#route add -net 192.168.220.0/24 10.30.0.1
+# 
