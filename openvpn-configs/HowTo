@@ -1,0 +1,106 @@
+Openvpn configurations======== OpenBSD6.x=========
+
+
+OpenBSD is a Multi – Platform Ultra Secure Operating System.
+
+This article intend to configure OpenVPN server under OpenBSD 6.0.
+Also this setup can be easy adapted to run on other platforms.
+
+
+# export PKG_PATH=http://ftp.openbsd.org/pub//OpenBSD/$(uname -r)/packages/$(uname -m)"
+# pkg_add openvpn easy-rsa
+# mkdir /etc/openvpn
+
+Create server.conf under previously created directory with the follow content:
+
+ proto tcp
+ port 443
+ dev tun
+ server 10.30.0.0 255.255.255.0
+ topology subnet
+ persist-key
+ persist-tun
+ keepalive 10 60
+ remote-cert-tls client
+ tls-auth /etc/openvpn/ta.key 0
+ dh /etc/openvpn/dh2048.pem
+ ca /etc/openvpn/ca.crt
+ cert /etc/openvpn/server.crt
+ key /etc/openvpn/server.key
+ user _openvpn
+ group _openvpn
+ verb 3
+ daemon
+ push "route 0.0.0.0 0.0.0.0"
+ push "redirect-gateway def1"
+ log-append /var/log/openvpn.log
+
+Generate Certificates
+==================================
+
+ # cd /usr/local/share/easy-rsa
+# ./easyrsa init-pki
+# ./easyrsa build-ca
+# ./easyrsa gen-crl   nopass
+# ./easyrsa build-server-full yourservername  nopass
+# ./easyrsa build-client-full clientname    nopass
+
+####If you're having problem with passphrase and you dont want that please use "nopass" otherwise not required. Easyrsa by default asks you for passphrase. 
+
+
+Create a file with extesion .ovpn
+===================================
+
+# cat ios.ovpn
+
+client 
+proto tcp 
+remote YOURSERVER
+port 443 
+dev tun 
+nobind 
+remote-cert-tls server 
+<ca> 
+-----BEGIN CERTIFICATE----- 
+....
+-----END CERTIFICATE----- 
+</ca> 
+<cert> 
+Certificate: 
+...
+-----BEGIN CERTIFICATE----- 
+...
+-----END CERTIFICATE----- 
+</cert> 
+<key> 
+-----BEGIN ENCRYPTED PRIVATE KEY----- 
+...
+-----END ENCRYPTED PRIVATE KEY----- 
+</key> 
+key-direction 1 
+<tls-auth> 
+-----BEGIN OpenVPN Static key V1----- 
+...
+-----END OpenVPN Static key V1----- 
+</tls-auth>
+
+
+Copy and paste the contents of respectively files accordingly with the example.
+-> Send to Iphone/Ipad/Android in a secure way and install OpenVPN cCient App using appstore/google play.
+
+# cat client.conf
+client 
+proto tcp 
+remote YOURSERVER
+port 443 
+dev tun 
+nobind 
+ 
+remote-cert-tls server 
+tls-auth /etc/openvpn/ta.key 1 
+ca /etc/openvpn/ca.crt 
+cert /etc/openvpn/client.crt 
+key /etc/openvpn/client.key
+
+Reference:
+https://www.packtpub.com/networking-and-servers/mastering-openvpn
